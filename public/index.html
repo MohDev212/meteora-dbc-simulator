@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meteora DBC Studio | Dynamic Bonding Curve Simulator & RWA Launchpad</title>
+  <meta name="description" content="Visual simulator, mathematical modeler, and preset studio for Meteora Dynamic Bonding Curves (DBC) & Tokenized RWAs on Solana. 100% Halal Asset Tokenization.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo-badge">Meteora DBC</div>
+        <div>
+          <h1>Dynamic Bonding Curve Studio</h1>
+          <div class="brand-sub">100% Halal RWA & Tokenized Equity Simulator</div>
+        </div>
+      </div>
+      <div class="header-tags">
+        <div class="tag live-badge">
+          <div class="live-dot"></div>
+          SDK v1.5.11 Verified
+        </div>
+        <div class="tag">DAMM v2 Native</div>
+        <div class="tag">Solana Mainnet & Devnet</div>
+      </div>
+    </header>
+
+    <!-- Top Grid: Interactive Chart + Live Metrics -->
+    <div class="dashboard-grid">
+      <!-- Left Column: Canvas Curve Visualization -->
+      <div class="card">
+        <div class="card-title">
+          <span>Bonding Curve Price Discovery & Reserve Accumulation</span>
+          <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted);" id="curveShapeBadge">Mode: Target Market Cap (Linear)</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="curveCanvas"></canvas>
+          <div id="chartTooltip" class="chart-tooltip"></div>
+        </div>
+
+        <!-- Metric Gauges -->
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">Initial Market Cap</div>
+            <div class="metric-val" id="dispInitialMC">20 SOL</div>
+            <div class="metric-sub" id="dispInitialPrice">$0.000020 SOL</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Graduation Target</div>
+            <div class="metric-val" id="dispGradMC">600 SOL</div>
+            <div class="metric-sub" id="dispGradPrice">$0.000600 SOL</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Quote Needed to Graduate</div>
+            <div class="metric-val highlight" id="dispThreshold">248.0 SOL</div>
+            <div class="metric-sub">Accumulated in Virtual Pool</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">DAMM v2 LP Lock</div>
+            <div class="metric-val" id="dispLockedPct" style="color: var(--accent);">10% Min</div>
+            <div class="metric-sub">Permanently Locked LP NFTs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Presets & Controls -->
+      <div class="card">
+        <div class="card-title">
+          <span>Curated Halal Presets</span>
+          <span style="font-size: 0.75rem; color: var(--accent); font-weight: 600;">Zero Interest • Asset-Backed</span>
+        </div>
+
+        <div class="presets-grid" id="presetsContainer">
+          <!-- Populated by app.js -->
+        </div>
+
+        <div class="card-title" style="margin-top: 16px;">
+          <span>Curve Parameters</span>
+        </div>
+
+        <form class="controls-form" id="configForm">
+          <div class="form-group">
+            <label class="form-label">
+              <span>Curve Shape</span>
+            </label>
+            <select class="form-select" id="inputCurveShape">
+              <option value="linear">Linear Curve (Balanced Discovery)</option>
+              <option value="exponential">Exponential Curve (High Graduation Depth)</option>
+              <option value="flat">Flat Curve (Stable / Low Volatility RWA)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Total Token Supply</span>
+              <span id="labelSupply">1,000,000,000</span>
+            </label>
+            <input type="number" class="form-input" id="inputSupply" value="1000000000" step="1000000">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">
+                <span>Initial MC (SOL)</span>
+              </label>
+              <input type="number" class="form-input" id="inputInitialMC" value="20" min="1" step="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span>Migration MC (SOL)</span>
+              </label>
+              <input type="number" class="form-input" id="inputGradMC" value="600" min="5" step="1">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">
+                <span>Base Fee (bps)</span>
+                <span id="labelFee">100 (1.0%)</span>
+              </label>
+              <input type="number" class="form-input" id="inputFeeBps" value="100" min="25" step="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span>Creator Fee Share (%)</span>
+                <span id="labelCreatorFee">50%</span>
+              </label>
+              <input type="number" class="form-input" id="inputCreatorFee" value="50" min="0" max="100" step="5">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Supply Deployed to DAMM v2 LP (%)</span>
+              <span id="labelMigratePct">20%</span>
+            </label>
+            <div class="range-wrap">
+              <input type="range" class="range-input" id="inputMigratePct" value="20" min="10" max="50" step="5">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Swap Simulator + Code Export -->
+    <div class="dashboard-grid">
+      <!-- Live Swap Simulator -->
+      <div class="card">
+        <div class="card-title">
+          <span>Live Swap Quoter & Impact Simulator</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ExactIn Bonding Simulation</span>
+        </div>
+
+        <div class="swap-grid">
+          <div>
+            <div class="form-group">
+              <label class="form-label">
+                <span>Simulate Buy Order (Quote Amount In)</span>
+              </label>
+              <div style="display: flex; gap: 8px;">
+                <input type="number" class="form-input" id="swapAmountIn" value="5" min="0.1" step="0.5">
+                <span style="display: flex; align-items: center; font-weight: 700; font-family: var(--font-mono); padding: 0 10px; background: #0d0f14; border: 1px solid var(--border); border-radius: 6px;">SOL</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span>Current Progress Along Curve</span>
+                <span id="swapProgressLabel">0.0%</span>
+              </label>
+              <input type="range" class="range-input" id="swapProgressSlider" value="0" min="0" max="100" step="1">
+            </div>
+          </div>
+
+          <div class="swap-result-box" id="swapResults">
+            <div class="swap-row">
+              <span style="color: var(--text-muted);">Estimated Tokens Out:</span>
+              <span style="color: var(--accent); font-weight: 700;" id="resTokensOut">—</span>
+            </div>
+            <div class="swap-row">
+              <span style="color: var(--text-muted);">Price Impact:</span>
+              <span id="resPriceImpact">—</span>
+            </div>
+            <div class="swap-row">
+              <span style="color: var(--text-muted);">Trading Fee (Quote):</span>
+              <span id="resFee">—</span>
+            </div>
+            <div class="swap-row">
+              <span style="color: var(--text-muted);">Creator Fee Share:</span>
+              <span style="color: var(--primary);" id="resCreatorFee">—</span>
+            </div>
+            <div class="swap-row">
+              <span style="color: var(--text-muted);">Migration Status:</span>
+              <span id="resGradStatus">On Curve</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Studio Code -->
+      <div class="card">
+        <div class="card-title">
+          <span>Export Production Integration</span>
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="ts">TypeScript SDK</button>
+            <button class="tab-btn" data-tab="jsonc">Studio JSONC</button>
+          </div>
+        </div>
+
+        <div class="code-wrapper">
+          <button class="btn-copy" id="btnCopyCode">Copy Code</button>
+          <pre><code id="codeDisplay">Loading...</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Meteora Dynamic Bonding Curve (DBC) & DAMM v2 Studio • Built for Superteam Earn Hackathon</div>
+      <div>Author: <a href="https://github.com/MohDev212" target="_blank" style="color: var(--text-main); text-decoration: none;">MohDev212</a> • Open Source (MIT)</div>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

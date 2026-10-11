@@ -1,0 +1,24 @@
+{
+  "name": "meteora-dbc-simulator",
+  "version": "1.0.0",
+  "description": "Interactive Visual Simulator, Mathematical Modeler, and Preset Studio for Meteora Dynamic Bonding Curves (DBC) & Tokenized RWAs on Solana",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "solana",
+    "meteora",
+    "dynamic-bonding-curve",
+    "dbc",
+    "damm-v2",
+    "bonding-curve",
+    "defi",
+    "rwa",
+    "tokenized-equity",
+    "web3"
+  ],
+  "author": "MohDev212",
+  "license": "MIT"
+}
