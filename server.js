@@ -34,11 +34,9 @@ const server = http.createServer((req, res) => {
     reqPath = '/index.html';
   }
 
-  // Handle src imports or public files
-  let filePath;
-  if (reqPath.startsWith('/src/')) {
-    filePath = path.join(__dirname, reqPath);
-  } else {
+  // Resolve file from root first, then public
+  let filePath = path.join(__dirname, reqPath);
+  if (!fs.existsSync(filePath)) {
     filePath = path.join(__dirname, 'public', reqPath);
   }
 
